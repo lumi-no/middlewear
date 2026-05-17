@@ -1,0 +1,87 @@
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+struct User
+{
+    string name;
+    bool authenticated;
+};
+
+string handle_request(User user)
+{
+    if (user.name == "Error")
+    {
+        throw runtime_error("Server error");
+    }
+
+    return "Request processed for " + user.name;
+}
+
+void log_request(User user)
+{
+    cout << "[LOG] Request from: "
+         << user.name << endl;
+}
+
+bool authorize(User user)
+{
+    if (!user.authenticated)
+    {
+        cout << "Access denied!" << endl;
+        return false;
+    }
+
+    return true;
+}
+
+void handle_errors(User user)
+{
+    try
+    {
+        string result = handle_request(user);
+
+        cout << result << endl;
+    }
+    catch (exception&)
+    {
+        cout << "Friendly error message!" << endl;
+    }
+}
+
+void middleware_chain(User user)
+{
+    log_request(user);
+
+    if (!authorize(user))
+    {
+        return;
+    }
+
+    handle_errors(user);
+}
+
+int main()
+{
+    User user1 = {"Anastasia", true};
+
+    User user2 = {"Ivan", false};
+
+    User user3 = {"Error", true};
+
+    cout << "----- User 1 -----" << endl;
+    middleware_chain(user1);
+
+    cout << endl;
+
+    cout << "----- User 2 -----" << endl;
+    middleware_chain(user2);
+
+    cout << endl;
+
+    cout << "----- User 3 -----" << endl;
+    middleware_chain(user3);
+
+    return 0;
+}
