@@ -1,0 +1,48 @@
+#include <iostream>
+#include <functional>
+#include <map>
+
+using namespace std;
+
+int square(int x)
+{
+    cout << "Calculating..." << endl;
+
+    return x * x;
+}
+
+function<int(int)> simple_cache(function<int(int)> func)
+{
+    map<int, int> cache;
+
+    return [=](int x) mutable -> int
+    {
+        if (cache.find(x) != cache.end())
+        {
+            cout << "From cache" << endl;
+
+            return cache[x];
+        }
+
+        int result = func(x);
+
+        cache[x] = result;
+
+        return result;
+    };
+}
+
+int main()
+{
+    auto cached_square = simple_cache(square);
+
+    cout << cached_square(5) << endl;
+    cout << endl;
+
+    cout << cached_square(5) << endl;
+    cout << endl;
+
+    cout << cached_square(7) << endl;
+
+    return 0;
+}
