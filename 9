@@ -1,0 +1,69 @@
+#include <iostream>
+#include <functional>
+#include <string>
+
+using namespace std;
+
+
+string run_task()
+{
+    return "Done";
+}
+
+string load_file()
+{
+    return "File loaded";
+}
+
+string connect_db()
+{
+    return "Database error";
+}
+
+
+function<string()> log_with_prefix
+(
+    string prefix,
+    function<string()> func
+)
+{
+    return [prefix, func]()
+    {
+        cout << "[" << prefix << "] "
+             << "Function started"
+             << endl;
+
+        string result = func();
+
+        cout << "[" << prefix << "] "
+             << "Result: "
+             << result
+             << endl;
+
+        return result;
+    };
+}
+
+int main()
+{
+    function<string()> infoTask =
+        log_with_prefix("INFO", run_task);
+
+    function<string()> warningTask =
+        log_with_prefix("WARNING", load_file);
+
+    function<string()> errorTask =
+        log_with_prefix("ERROR", connect_db);
+
+    infoTask();
+
+    cout << endl;
+
+    warningTask();
+
+    cout << endl;
+
+    errorTask();
+
+    return 0;
+}
