@@ -1,0 +1,35 @@
+Чому потрібна ще одна вкладеність функцій 
+У Python: @repeat(3) спочатку передає число 3. 
+Тільки потім Python передає саму функцію. Тому логіка йде у 2 етапи: 
+зовнішня функція отримує n, внутрішня функція отримує саму функцію. 
+
+#include <iostream>
+#include <functional>
+
+using namespace std;
+
+void say_hi()
+{
+    cout << "Hi" << endl;
+}
+
+function<void()> repeat(int n, function<void()> func)
+{
+    return [n, func]()
+    {
+        for (int i = 0; i < n; i++)
+        {
+            func();
+        }
+    };
+}
+
+int main()
+{
+    function<void()> repeatedHi =
+        repeat(3, say_hi);
+
+    repeatedHi();
+
+    return 0;
+}
