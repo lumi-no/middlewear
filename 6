@@ -1,0 +1,73 @@
+#include <iostream>
+#include <functional>
+#include <string>
+
+using namespace std;
+
+string sayHello()
+{
+    return "Hello";
+}
+
+int sum(int a, int b)
+{
+    return a + b;
+}
+
+string greet(string name, string prefix)
+{
+    return prefix + ", " + name;
+}
+
+function<string()> debugNoArgs(function<string()> func)
+{
+    return [func]()
+    {
+        cout << "Positional arguments: none" << endl;
+        cout << "Named arguments: none" << endl;
+
+        return func();
+    };
+}
+
+function<int(int, int)> debugTwoInts(function<int(int, int)> func)
+{
+    return [func](int a, int b)
+    {
+        cout << "Positional arguments: " << a << ", " << b << endl;
+        cout << "Named arguments: none" << endl;
+
+        return func(a, b);
+    };
+}
+
+function<string(string, string)> debugGreet(function<string(string, string)> func)
+{
+    return [func](string name, string prefix)
+    {
+        cout << "Positional arguments: none" << endl;
+        cout << "Named arguments: name = " << name
+             << ", prefix = " << prefix << endl;
+
+        return func(name, prefix);
+    };
+}
+
+int main()
+{
+    auto debugHello = debugNoArgs(sayHello);
+    auto debugSum = debugTwoInts(sum);
+    auto debugGreeting = debugGreet(greet);
+
+    cout << "Result: " << debugHello() << endl;
+
+    cout << endl;
+
+    cout << "Result: " << debugSum(10, 20) << endl;
+
+    cout << endl;
+
+    cout << "Result: " << debugGreeting("Anastasia", "Hello") << endl;
+
+    return 0;
+}
