@@ -1,0 +1,76 @@
+Декоратори виконуються зверху вниз logger - записує інформацію про виклик функції; positive_only -перевіряє значення. якщо число ≤ 0 — зупиняє виконання; timer- вимірює час роботи функції; process_data - виконує основну логіку.  
+Як змінюється поведінка- без декораторів функція просто множить число на 2.  
+Після додавання декораторів з’являється логування, перевірка правильності даних, вимірювання часу, можливість зупинити виконання при помилці.
+
+#include <iostream>
+#include <string>
+#include <chrono>
+
+using namespace std;
+using namespace chrono;
+
+int process_data(int x)
+{
+    return x * 2;
+}
+
+bool positive_only(int x)
+{
+    if (x <= 0)
+    {
+        cout << "Only positive numbers allowed!" << endl;
+        return false;
+    }
+
+    return true;
+}
+
+void logger(int x)
+{
+    cout << "[LOG] Function called with x = "
+         << x << endl;
+}
+
+void timer(high_resolution_clock::time_point start,
+           high_resolution_clock::time_point end)
+{
+    auto duration =
+        duration_cast<microseconds>(end - start);
+
+    cout << "[TIMER] "
+         << duration.count()
+         << " microseconds" << endl;
+}
+
+void run_process(int x)
+{
+    logger(x);
+
+    if (!positive_only(x))
+    {
+        return;
+    }
+
+    auto start = high_resolution_clock::now();
+
+    int result = process_data(x);
+
+    auto end = high_resolution_clock::now();
+
+    timer(start, end);
+
+    cout << "Result: " << result << endl;
+}
+
+int main()
+{
+    cout << "----- Positive -----" << endl;
+    run_process(5);
+
+    cout << endl;
+
+    cout << "----- Negative -----" << endl;
+    run_process(-3);
+
+    return 0;
+}
