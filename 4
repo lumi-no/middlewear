@@ -1,0 +1,55 @@
+#include <iostream>
+#include <functional>
+#include <chrono>
+
+using namespace std;
+using namespace chrono;
+
+long long slow_sum(int n)
+{
+    long long total = 0;
+
+    for (int i = 0; i < n; i++)
+    {
+        total += i;
+    }
+
+    return total;
+}
+
+function<long long(int)> timer(function<long long(int)> func)
+{
+    return [func](int n)
+    {
+        auto start = high_resolution_clock::now();
+
+        long long result = func(n);
+
+        auto end = high_resolution_clock::now();
+
+        auto duration = duration_cast<milliseconds>(end - start);
+
+        cout << "Execution time: "
+             << duration.count()
+             << " ms" << endl;
+
+        return result;
+    };
+}
+
+int main()
+{
+    function<long long(int)> timedSlowSum = timer(slow_sum);
+
+    cout << "Result: "
+         << timedSlowSum(1000000)
+         << endl;
+
+    cout << endl;
+
+    cout << "Result: "
+         << timedSlowSum(5000000)
+         << endl;
+
+    return 0;
+}
