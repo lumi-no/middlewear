@@ -1,0 +1,40 @@
+wrapper додає нову поведінку навколо іншої функції. Тобто до виклику функції виконується додатковий код, а після виклику теж виконується код. Як змінюється поведінка оригінальної функції. Сама логіка greet не 
+змінилась, але навколо неї додалась додаткова обробка.
+
+#include <iostream>
+#include <functional>
+#include <string>
+
+using namespace std;
+
+string greet(string name)
+{
+    return "Hello, " + name;
+}
+
+function<string(string)> wrapper(function<string(string)> func)
+{
+    auto inner = [func](string name)
+    {
+        cout << "Before function call" << endl;
+
+        string result = func(name);
+
+        cout << "After function call" << endl;
+
+        return result;
+    };
+
+    return inner;
+}
+
+int main()
+{
+    function<string(string)> wrappedGreet = wrapper(greet);
+
+    string result = wrappedGreet("Anastasia");
+
+    cout << result << endl;
+
+    return 0;
+}
