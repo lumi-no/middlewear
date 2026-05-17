@@ -1,0 +1,40 @@
+Декоратор можна розглядати як функціональну трансформацію, тому що він приймає функцію як аргумент, не змінює код самої функції, повертає нову функцію з іншою 
+поведінкою.
+#include <iostream>
+#include <functional>
+#include <string>
+#include <algorithm>
+
+using namespace std;
+
+string greet(string name)
+{
+    return "Hello, " + name;
+}
+
+function<string(string)>
+to_uppercase_result(function<string(string)> func)
+{
+    return [=](string name) -> string
+    {
+        string result = func(name);
+
+        transform(result.begin(),
+                  result.end(),
+                  result.begin(),
+                  ::toupper);
+
+        return result;
+    };
+}
+
+int main()
+{
+    auto decorated_greet =
+        to_uppercase_result(greet);
+
+    cout << decorated_greet("Anastasia")
+         << endl;
+
+    return 0;
+}
