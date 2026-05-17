@@ -1,0 +1,68 @@
+#include <iostream>
+#include <functional>
+#include <string>
+
+using namespace std;
+
+int square(int x)
+{
+    return x * x;
+}
+
+int sum(int a, int b)
+{
+    return a + b;
+}
+
+int multiply(int a, int b)
+{
+    return a * b;
+}
+
+function<int(int)> loggerOne(function<int(int)> func, string funcName)
+{
+    return [func, funcName](int x)
+    {
+        cout << "Calling function: " << funcName << endl;
+
+        int result = func(x);
+
+        cout << "Result: " << result << endl;
+
+        return result;
+    };
+}
+
+function<int(int, int)> loggerTwo(function<int(int, int)> func, string funcName)
+{
+    return [func, funcName](int a, int b)
+    {
+        cout << "Calling function: " << funcName << endl;
+
+        int result = func(a, b);
+
+        cout << "Result: " << result << endl;
+
+        return result;
+    };
+}
+
+int main()
+{
+    function<int(int)> loggedSquare = loggerOne(square, "square");
+
+    function<int(int, int)> loggedSum = loggerTwo(sum, "sum");
+    function<int(int, int)> loggedMultiply = loggerTwo(multiply, "multiply");
+
+    loggedSquare(5);
+
+    cout << endl;
+
+    loggedSum(10, 20);
+
+    cout << endl;
+
+    loggedMultiply(3, 7);
+
+    return 0;
+}
