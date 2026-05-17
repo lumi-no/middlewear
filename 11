@@ -1,0 +1,40 @@
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+struct User
+{
+    string name;
+    bool authenticated;
+};
+
+string dashboard(User user)
+{
+    return "Welcome, " + user.name;
+}
+
+string require_auth(User user)
+{
+    if (user.authenticated == false)
+    {
+        return "Access denied";
+    }
+
+    return dashboard(user);
+}
+
+int main()
+{
+    User user1 = {"Anastasia", true};
+
+    User user2 = {"Ivan", false};
+
+    cout << "Користувач 1: " 
+         << require_auth(user1) << endl;
+
+    cout << "Користувач 2: " 
+         << require_auth(user2) << endl;
+
+    return 0;
+}
