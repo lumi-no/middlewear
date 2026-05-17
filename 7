@@ -1,0 +1,83 @@
+wraps потрібен, щоб після декорування не губились метадані функції: 
+ім’я функції;  
+опис функції;  
+інформація для відладки;  
+Документація. 
+
+#include <iostream>
+#include <functional>
+#include <string>
+
+using namespace std;
+
+struct FunctionInfo
+{
+    string name;
+    function<int(int)> func;
+};
+
+int square(int x)
+{
+    return x * x;
+}
+
+FunctionInfo decoratorWithoutWraps(FunctionInfo original)
+{
+    FunctionInfo wrapped;
+
+    wrapped.name = "wrapper";
+
+    wrapped.func = [original](int x)
+    {
+        cout << "Before function call" << endl;
+        return original.func(x);
+    };
+
+    return wrapped;
+}
+
+FunctionInfo decoratorWithWraps(FunctionInfo original)
+{
+    FunctionInfo wrapped;
+
+    wrapped.name = original.name;
+
+    wrapped.func = [original](int x)
+    {
+        cout << "Before function call" << endl;
+        return original.func(x);
+    };
+
+    return wrapped;
+}
+
+int main()
+{
+    FunctionInfo squareInfo;
+    squareInfo.name = "square";
+    squareInfo.func = square;
+
+    FunctionInfo withoutWraps = decoratorWithoutWraps(squareInfo);
+
+    cout << "Name without wraps: "
+         << withoutWraps.name
+         << endl;
+
+    cout << "Result: "
+         << withoutWraps.func(5)
+         << endl;
+
+    cout << endl;
+
+    FunctionInfo withWraps = decoratorWithWraps(squareInfo);
+
+    cout << "Name with wraps: "
+         << withWraps.name
+         << endl;
+
+    cout << "Result: "
+         << withWraps.func(5)
+         << endl;
+
+    return 0;
+}
