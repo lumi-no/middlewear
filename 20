@@ -1,0 +1,137 @@
+#include <iostream>
+#include <string>
+#include <functional>
+#include <chrono>
+
+using namespace std;
+using namespace chrono;
+
+struct User
+{
+    string name;
+    bool authenticated;
+};
+
+using RequestFunction = function<string(User, int)>;
+
+string handle_request(User user, int value)
+{
+    if (value == 999)
+    {
+        throw runtime_error("Internal error");
+    }
+
+    return "Processed value: " + to_string(value);
+}
+
+RequestFunction logger(RequestFunction next)
+{
+    return [=](User user, int value) -> string
+    {
+        cout << "[LOG] User: " << user.name
+             << ", value: " << value << endl;
+
+        return next(user, value);
+    };
+}
+
+RequestFunction require_auth(RequestFunction next)
+{
+    return [=](User user, int value) -> string
+    {
+        if (!user.authenticated)
+        {
+            return "Access denied";
+        }
+
+        return next(user, value);
+    };
+}
+
+RequestFunction validate_positive(RequestFunction next)
+{
+    return [=](User user, int value) -> string
+    {
+        if (value < 0)
+        {
+            return "Value must be positive";
+        }
+
+        return next(user, value);
+    };
+}
+
+RequestFunction handle_errors(RequestFunction next)
+{
+    return [=](User user, int value) -> string
+    {
+        try
+        {
+            return next(user, value);
+        }
+        catch (exception&)
+        {
+            return "Something went wrong";
+        }
+    };
+}
+
+RequestFunction timer(RequestFunction next)
+{
+    return [=](User user, int value) -> string
+    {
+        auto start = high_resolution_clock::now();
+
+        string result = next(user, value);
+
+        auto end = high_resolution_clock::now();
+
+        auto duration =
+            duration_cast<microseconds>(end - start);
+
+        cout << "[TIMER] "
+             << duration.count()
+             << " microseconds" << endl;
+
+        return result;
+    };
+}
+
+int main()
+{
+    User user1 = {"Anastasia", true};
+    User user2 = {"Ivan", false};
+
+    RequestFunction app =
+        handle_errors(
+            logger(
+                timer(
+                    require_auth(
+                        validate_positive(
+                            handle_request
+                        )
+                    )
+                )
+            )
+        );
+
+    cout << "----- 1. Authorized + valid -----" << endl;
+    cout << app(user1, 10) << endl;
+
+    cout << endl;
+
+    cout << "----- 2. Unauthorized -----" << endl;
+    cout << app(user2, 10) << endl;
+
+    cout << endl;
+
+    cout << "----- 3. Negative value -----" << endl;
+    cout << app(user1, -5) << endl;
+
+    cout << endl;
+
+    cout << "----- 4. Internal error -----" << endl;
+    cout << app(user1, 999) << endl;
+
+    return 0;
+}
