@@ -1,0 +1,27 @@
+Чому функція може бути значенням  
+У C++ функцію можна: зберігати у змінній, передавати як параметр, повертати з іншої функції.  
+У цьому прикладі: outer() повертає функцію inner, а змінна func зберігає її. функція outer повертає іншу функцію, тому вона є функцією вищого порядку. 
+
+#include <iostream>
+#include <functional>
+
+using namespace std;
+
+function<void()> outer()
+{
+    auto inner = []()
+    {
+        cout << "Hello from inner" << endl;
+    };
+
+    return inner;
+}
+
+int main()
+{
+    function<void()> func = outer();
+
+    func();
+
+    return 0;
+}
