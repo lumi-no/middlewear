@@ -1,0 +1,41 @@
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+struct UserData
+{
+    string name;
+};
+
+string create_user(UserData data)
+{
+    return "User " + data.name + " created";
+}
+
+string validate_name(UserData data)
+{
+    if (data.name.empty())
+    {
+        return "Validation error: name is empty";
+    }
+
+    return create_user(data);
+}
+
+int main()
+{
+    UserData user1 = {"Anastasia"};
+
+    UserData user2 = {""};
+
+    cout << "User 1:" << endl;
+    cout << validate_name(user1) << endl;
+
+    cout << endl;
+
+    cout << "User 2:" << endl;
+    cout << validate_name(user2) << endl;
+
+    return 0;
+}
